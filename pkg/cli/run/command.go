@@ -132,6 +132,8 @@ func (r *runner) Command(logger *slogutil.Logger, globalFlags *gflag.GlobalFlags
 		"Verify that the version comment matches the pinned SHA")
 	fs.BoolVar(&flags.VerifyMinAge, "verify-min-age", false,
 		"Audit every pinned action against the min-age threshold (calls the GitHub API). Auto-enabled when --min-age is set on the CLI")
+	fs.BoolVar(&flags.ActionsLock, "actions-lock", false,
+		"Accept official actions.lock pins for registered workflows. Enable only where GitHub.com enforces lockfiles; run from the repository root")
 	fs.BoolVar(&flags.NoAPI, "no-api", false,
 		"Skip GitHub API calls. Only the syntactic pin check (40-character SHA) is performed")
 	fs.BoolVar(&flags.Check, "check", false,

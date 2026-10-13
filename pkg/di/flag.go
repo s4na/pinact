@@ -15,6 +15,7 @@ type Flags struct {
 	VerifyComment bool
 	VerifyMinAge  bool
 	NoAPI         bool
+	ActionsLock   bool
 
 	// --check and --diff are silent aliases for --fix=false in v4. They keep
 	// their own destinations so buildParam can translate them.

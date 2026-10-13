@@ -9,6 +9,8 @@
 package run
 
 import (
+	"context"
+
 	"github.com/spf13/afero"
 	"github.com/suzuki-shunsuke/pinact/v5/pkg/config"
 )
@@ -20,6 +22,7 @@ type Controller struct {
 	cfg                 *config.Config
 	param               *ParamRun
 	logger              *Logger
+	verifyActionsLock   func(context.Context, string, []string) error
 }
 
 // New creates a new Controller for running pinact operations.

@@ -340,6 +340,7 @@ Usage:
   pinact run [<workflow file>...] [flags]
 
 Flags:
+      --actions-lock            Accept official actions.lock pins for registered workflows. Enable only where GitHub.com enforces lockfiles; run from the repository root
       --branch-to-tag strings   A regular expression to convert non-semver versions (e.g. branch names) to the latest stable tag. Anchor with ^$ for exact match
       --check                   Alias for --fix=false. For offline check use --fix=false --no-api
       --diff                    Alias for --fix=false. Note: --diff=false is ignored because detail output is always printed in v4

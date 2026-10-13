@@ -40,3 +40,7 @@ pinact run --verify-comment
 
 This checks that a version comment names the version its SHA actually is, which a comment written by hand or by an attacker doesn't have to.
 [Please see `Verify version comments`.](codes/001.md)
+
+For registered GitHub workflow dependency lockfiles, opt in explicitly; see
+[Official workflow dependency lockfiles](actions_lock.md) for prerequisites,
+online/offline guarantees and unsupported options.

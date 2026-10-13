@@ -100,6 +100,7 @@ pinact docs show codes/005 # A document in a subdirectory is named by its path
 ```
 
 - [Usage](docs/usage.md) - run pinact, which files it pins when none is given, and pinning actions written in a document.
+- [Official workflow dependency lockfiles](docs/actions_lock.md) - opt-in validation of GitHub actions.lock, mixed repositories, guarantees and limitations.
 - [Checking without fixing](docs/check.md) - `--check`, `--fix=false`, the offline check `--no-api`, and verifying version comments.
 - [Updating actions](docs/update.md) - `--update` and the minimum release age (cooldown).
 - [Pin branches](docs/branch_to_tag.md) - `--branch-to-tag`, which opts a branch reference in to being pinned.

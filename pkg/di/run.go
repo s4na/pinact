@@ -172,6 +172,8 @@ func buildParam(flags *Flags) (*run.ParamRun, error) {
 		VerifyMinAge:      flags.VerifyMinAge,
 		Update:            flags.Update,
 		NoAPI:             flags.NoAPI,
+		ActionsLock:       flags.ActionsLock,
+		IsGHES:            flags.GetAPIURL() != "",
 		Fix:               resolveFix(flags),
 		IsGitHubActions:   flags.IsGitHubActions,
 		Stderr:            os.Stderr,
