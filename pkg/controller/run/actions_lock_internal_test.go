@@ -149,10 +149,11 @@ func TestActionsLockCoverage(t *testing.T) {
 func TestActionsLockGraphAndReusableBoundary(t *testing.T) { //nolint:cyclop // Composite closure checks and separate reusable workflow contexts.
 	t.Parallel()
 	child := "actions/cache@v4"
-	content := testActionsLock + "    uses:\n      - " + child + "\n  " + child + ":\n    ref: v4\n    commit: sha1-" + strings.Repeat("a", 40) + "\n    owner_id: 44036562\n    repo_id: 251882839\n"
+	content := strings.Replace(testActionsLock, "    - actions/checkout@v4.2.2\n", "    - actions/checkout@v4.2.2\n    - "+child+"\n", 1) + "    uses:\n      - " + child + "\n  " + child + ":\n    ref: v4\n    commit: sha1-" + strings.Repeat("a", 40) + "\n    owner_id: 44036562\n    repo_id: 251882839\n"
 	for _, tc := range []struct{ name, content, want string }{
 		{"recorded composite graph", content, ""},
 		{"missing transitive", testActionsLock + "    uses:\n      - " + child + "\n", "missing"},
+		{"unreachable transitive registration", strings.Replace(content, "    uses:\n      - "+child+"\n", "    uses: []\n", 1), "not used by the workflow"},
 		{"cycle", testActionsLock + "    uses:\n      - actions/checkout@v4.2.2\n", "cycle"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {

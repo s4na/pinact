@@ -60,7 +60,7 @@ uses its own supported credentials, including `GH_TOKEN`/`GITHUB_TOKEN`.
 
 | Mode | Guarantee | Not guaranteed |
 | --- | --- | --- |
-| `--actions-lock --fix=false --no-api` | Official parser validates schema, digest syntax, identity-field structure and graph cycles; actual YAML `jobs`/`steps` references match the selected workflow's registration; every reachable recorded dependency exists; stale direct pins fail | Upstream repository identity, commit/ref authenticity, remote action contents, missing edges in a forged graph, runtime eligibility/enforcement |
+| `--actions-lock --fix=false --no-api` | Official parser validates schema, digest syntax, identity-field structure and graph cycles; actual YAML `jobs`/`steps` references match the selected workflow's registration; registered pins must be reachable from those references through recorded dependencies | Upstream repository identity, commit/ref authenticity, remote action contents, missing edges in a forged graph, runtime eligibility/enforcement |
 | `--actions-lock --check` (online) | Local checks above, then the official `gh actions-lock --verify --no-fix` frozen verification, scoped to selected registered workflows | Missing edges in a forged remote composite graph, `owner_id` equality, another repository's reusable workflow dependencies, runtime eligibility/enforcement |
 
 Offline success is reported as **local coverage/recorded graph checking**, with

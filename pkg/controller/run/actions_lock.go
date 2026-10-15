@@ -270,9 +270,27 @@ func validateLockWorkflow(data []byte, lf lockfile.File, workflow string) error 
 			}
 		}
 	}
+	// The workflow registration is a flat list containing both direct refs and
+	// dependencies discovered inside composite actions. Check that every entry
+	// is reachable from a ref in the workflow instead of requiring every entry
+	// to appear directly in YAML.
+	reachable := map[string]bool{}
+	var visit func(string)
+	visit = func(pin string) {
+		if reachable[pin] {
+			return
+		}
+		reachable[pin] = true
+		for _, dependency := range lf.Dependencies[pin].Uses {
+			visit(dependency)
+		}
+	}
+	for pin := range used {
+		visit(pin)
+	}
 	for _, pin := range lf.Workflows[workflow] {
-		if !used[pin] {
-			return fmt.Errorf("registered direct dependency %q is not used by the workflow", pin)
+		if !reachable[pin] {
+			return fmt.Errorf("registered dependency %q is not used by the workflow or its transitive dependencies", pin)
 		}
 	}
 	return nil
