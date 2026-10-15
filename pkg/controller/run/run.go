@@ -27,6 +27,8 @@ type ParamRun struct {
 	IsGitHubActions   bool
 	Fix               bool
 	NoAPI             bool
+	ActionsLock       bool
+	IsGHES            bool
 	Stderr            io.Writer
 	Stdout            io.Writer
 	Includes          []*regexp.Regexp
@@ -74,9 +76,9 @@ var (
 // It searches for workflow files and processes each file
 // to pin GitHub Actions versions according to the specified parameters.
 func (c *Controller) Run(ctx context.Context, logger *slog.Logger) error {
-	workflowFilePaths, err := c.searchFiles()
+	workflowFilePaths, err := c.filesForRun(ctx, logger)
 	if err != nil {
-		return fmt.Errorf("search target files: %w", err)
+		return err
 	}
 
 	exitCode := ExitCodeOK

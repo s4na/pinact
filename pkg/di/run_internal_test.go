@@ -204,3 +204,27 @@ func Test_validateFlagCombo(t *testing.T) {
 		})
 	}
 }
+
+func TestBuildParamActionsLockHost(t *testing.T) {
+	t.Parallel()
+	for _, tc := range []struct {
+		name, githubAPI, ghesAPI string
+		ghes                     bool
+	}{
+		{"default", "", "", false},
+		{"github.com", "https://api.github.com", "", false},
+		{"custom GitHub API", "https://ghes.example.com/api/v3", "", true},
+		{"GHES API override", "https://api.github.com", "https://ghes.example.com", true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			param, err := buildParam(&Flags{GlobalFlags: &gflag.GlobalFlags{}, ActionsLock: true, GitHubAPIURL: tc.githubAPI, GHESAPIURL: tc.ghesAPI})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !param.ActionsLock || param.IsGHES != tc.ghes {
+				t.Fatalf("ActionsLock=%v IsGHES=%v", param.ActionsLock, param.IsGHES)
+			}
+		})
+	}
+}
