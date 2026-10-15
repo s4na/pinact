@@ -331,6 +331,8 @@ func TestActionsLockVerifyCommand(t *testing.T) {
 	t.Setenv("GH_ACTIONS_LOCK_INSECURE", "1")
 	t.Setenv("GH_ACTIONS_LOCK_WORKFLOWS_DIR", "/another-lockfile")
 	t.Setenv("GH_ACTIONS_LOCK_DEPENDABOT_PROXY", "1")
+	t.Setenv("Gh_Actions_Lock_Insecure", "1")
+	t.Setenv("gH_aCtIoNs_LoCk_PrOxY", "https://proxy.example")
 	c, _ := lockController(t, testActionsLock, lockWorkflow("actions/checkout@v4.2.2"))
 	cmd := c.actionsLockVerifyCommand(t.Context(), c.param.CWD, []string{".github/workflows/ci.yml"})
 	want := []string{"gh", "actions-lock", "--verify", "--no-fix", "--no-interactive", "--hostname", "github.com", "--json=valid,findings,workflows", "--", ".github/workflows/ci.yml"}
@@ -338,7 +340,8 @@ func TestActionsLockVerifyCommand(t *testing.T) {
 		t.Fatalf("command args = %v, dir = %s", cmd.Args, cmd.Dir)
 	}
 	for _, env := range cmd.Env {
-		if strings.HasPrefix(env, "GH_ACTIONS_LOCK_") && env != "GH_ACTIONS_LOCK_REPO_ROOT="+c.param.CWD {
+		key, _, _ := strings.Cut(env, "=")
+		if strings.HasPrefix(strings.ToUpper(key), "GH_ACTIONS_LOCK_") && env != "GH_ACTIONS_LOCK_REPO_ROOT="+c.param.CWD {
 			t.Fatalf("unsafe override retained: %s", env)
 		}
 	}

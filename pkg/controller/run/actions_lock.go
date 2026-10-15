@@ -118,7 +118,7 @@ func (c *Controller) loadActionsLock() (string, *lockfile.File, error) {
 	}
 	content, err := afero.ReadFile(c.fs, filepath.Join(root, lockfile.Path))
 	if err != nil {
-		return root, nil, fmt.Errorf("read actions.lock: %w", err)
+		return root, nil, ecerror.Wrap(fmt.Errorf("read actions.lock: %w", err), ExitCodeAPIError)
 	}
 	lf, err := lockfile.ParseWithPolicy(content, lockfile.VersionPolicy{Min: "v0.0.2", Max: "v0.0.3"})
 	if err != nil {
@@ -142,7 +142,7 @@ func (c *Controller) validateLockedWorkflows(root string, lf lockfile.File, work
 		}
 		data, err := afero.ReadFile(c.fs, filepath.Join(root, filepath.FromSlash(workflow)))
 		if err != nil {
-			return fmt.Errorf("read locked workflow %s: %w", workflow, err)
+			return ecerror.Wrap(fmt.Errorf("read locked workflow %s: %w", workflow, err), ExitCodeAPIError)
 		}
 		if err := validateLockWorkflow(data, lf, workflow); err != nil {
 			return lockError("%s: %v; inspect and run gh actions-lock", workflow, err)
@@ -336,7 +336,8 @@ func (c *Controller) actionsLockVerifyCommand(ctx context.Context, root string, 
 	// Extension overrides can select another lockfile, a proxy, or insecure
 	// transport. They cannot alter the verification of the file we just read.
 	for _, env := range os.Environ() {
-		if !strings.HasPrefix(env, "GH_ACTIONS_LOCK_") {
+		key, _, _ := strings.Cut(env, "=")
+		if !strings.HasPrefix(strings.ToUpper(key), "GH_ACTIONS_LOCK_") {
 			cmd.Env = append(cmd.Env, env)
 		}
 	}
