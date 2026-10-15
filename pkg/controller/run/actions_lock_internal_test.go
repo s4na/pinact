@@ -58,6 +58,39 @@ func lockController(t *testing.T, content, workflow string) (*Controller, []stri
 	}), files
 }
 
+type failingReadFS struct {
+	afero.Fs
+	path string
+}
+
+func (fs failingReadFS) Open(name string) (afero.File, error) {
+	if name == fs.path {
+		return nil, os.ErrPermission
+	}
+	return fs.Fs.Open(name)
+}
+
+func TestActionsLockReadFailuresUseUnexpectedErrorExitCode(t *testing.T) {
+	t.Parallel()
+	for _, tc := range []struct {
+		name string
+		path func(*Controller) string
+	}{
+		{"lockfile", func(c *Controller) string { return filepath.Join(c.param.CWD, lockfile.Path) }},
+		{"registered workflow", func(c *Controller) string { return c.param.WorkflowFilePaths[0] }},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			c, _ := lockController(t, testActionsLock, lockWorkflow("actions/checkout@v4.2.2"))
+			c.fs = failingReadFS{Fs: c.fs, path: tc.path(c)}
+			err := c.Run(t.Context(), slog.New(slog.DiscardHandler))
+			if got := ecerror.GetExitCode(err); got != ExitCodeAPIError {
+				t.Fatalf("exit code = %d, want %d (error: %v)", got, ExitCodeAPIError, err)
+			}
+		})
+	}
+}
+
 func TestActionsLockCoverage(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
